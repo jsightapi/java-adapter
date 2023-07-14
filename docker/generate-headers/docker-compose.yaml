@@ -6,5 +6,5 @@ services:
     volumes:
       - ./../../src:/app/src
       - ./../../target:/app/target
-    command: javac -h /app/src/cpp -d /app/target/classes /app/src/main/java/io/jsight
+    command: javac -h /app/src/cpp -d /app/target/classes /app/src/main/java/io/jsight/JSight.java
     
