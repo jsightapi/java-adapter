@@ -1,7 +1,8 @@
 #include <jni.h>
 #include <dlfcn.h>
-#include "io_jsight_validator_demo_JSightMonitor.h"
+#include "io_jsight_JSight.h"
 #include "libjsight_init.h"
+#include "libjsight.h" // Go library .h file.
 
 /* linked go functions pointers */
 /*char* (*go_func_JapiValidateInput)        (char*, char*, char*, char*, char*);
