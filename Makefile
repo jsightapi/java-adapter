@@ -7,5 +7,5 @@ build:
 	docker build -f ./docker/build/Dockerfile --tag jsight:java_lib_builder --progress plain --output build .
 
 test:
-	cd docker/test && docker compose up
+	docker compose -f ./docker/test/docker-compose.yaml up
 
