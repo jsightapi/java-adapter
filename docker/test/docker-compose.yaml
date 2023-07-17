@@ -1,0 +1,9 @@
+version: '3.1'
+services:
+  headers: 
+    image: maven:latest
+    container_name: java_lib_test
+    volumes:
+      - ./../..:/app
+    working_dir: /app
+    
