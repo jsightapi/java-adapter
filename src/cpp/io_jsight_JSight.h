@@ -9,11 +9,11 @@ extern "C" {
 #endif
 /*
  * Class:     io_jsight_JSight
- * Method:    Init
- * Signature: ()Z
+ * Method:    initSharedLibrary
+ * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT jboolean JNICALL Java_io_jsight_JSight_Init
-  (JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_io_jsight_JSight_initSharedLibrary
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     io_jsight_JSight

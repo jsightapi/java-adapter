@@ -9,21 +9,23 @@
 #include <string.h>
 #include "libjsight_init.h"
 
-#define LIBJSIGHT "/usr/local/lib/libjsight.so"
-
-pthread_once_t libjapi_once = PTHREAD_ONCE_INIT;
+static char libjsight_path[1024];
+static void* libjsight_handle = NULL;
+pthread_once_t libjsight_once = PTHREAD_ONCE_INIT;
 
 static void libjsight_init_imp()
 {
-	libjsight_handle = dlopen(LIBJSIGHT, RTLD_NOW | RTLD_GLOBAL);
+	libjsight_handle = dlopen(libjsight_path, RTLD_NOW | RTLD_GLOBAL);
 	if (!libjsight_handle) {
-		fprintf(stderr, "libjsight_init: dlopen failed for %s: %s\n", LIBJSIGHT, dlerror());
+		fprintf(stderr, "libsight_init: dlopen failed for %s: %s\n", libjsight_path, dlerror());
 	}
 }
 
-int libjsight_init()
+int libjsight_init(char * dir)
 {
-	int err = pthread_once(&libjapi_once, libjsight_init_imp);
+	snprintf(libjsight_path, sizeof(libjsight_path), "%s/libjsight.so", dir);
+
+	int err = pthread_once(&libjsight_once, libjsight_init_imp);
 	if (err != 0) {
 		char buf[256];
 		if (strerror_r(err, buf, sizeof(buf)) == -1) {

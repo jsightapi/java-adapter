@@ -22,7 +22,9 @@ public class AppTest
 
     @Test
     public void testJSightStat() {
+        JSight.Init();
         String stat = JSight.Stat();
+        System.out.println( stat );
         assertNotNull( stat );
     }
 }

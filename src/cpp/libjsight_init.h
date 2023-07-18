@@ -1,8 +1,6 @@
-#ifndef JLIB_INIT_H
-#define JLIB_INIT_H
+#ifndef LIBJSIGHT_INIT_H
+#define LIBJSIGHT_INIT_H
 
-static void* libjsight_handle = NULL;
+int libjsight_init(char * dir);
 
-int libjsight_init();
-
-#endif	/* JLIB_INIT_H */
+#endif	/* LIBJSIGHT_INIT_H */

@@ -4,12 +4,21 @@ import java.util.Map;
 import io.jsight.ValidationError;
 
 public class JSight {
+
     static {
         System.loadLibrary("jsightjava");
-        Init();
-    }    
+    }
 
-    public static native boolean Init();
+    private static native void initSharedLibrary(String libDir);
+
+    public static void Init() {
+        Init("/usr/local/lib");
+    }
+
+    public static void Init(String jsightLibDir) {
+        initSharedLibrary(jsightLibDir);
+    }
+
     public static native String Stat();
     public static native void ClearCache();
     

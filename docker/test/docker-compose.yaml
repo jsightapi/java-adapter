@@ -7,6 +7,8 @@ services:
     container_name: java_lib_test
     volumes:
       - ./../../:/app
+      - ./../../jsight-lib/1.0.0:/usr/local/lib
+      - ./../../build:/usr/java/packages/lib
     working_dir: /app
     command: mvn test
     

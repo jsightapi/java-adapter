@@ -27,8 +27,26 @@ void io_jsight_JSight_init() {
     return JNI_TRUE;
 } */
 
-JNIEXPORT jstring JNICALL Java_io_jsight_validator_1demo_JSightMonitor_Stat (JNIEnv * env, jclass theClass) {
-    libjsight_init();
+/*
+ * Class:     io_jsight_JSight
+ * Method:    initSharedLibrary
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT void JNICALL Java_io_jsight_JSight_initSharedLibrary
+(JNIEnv * env, jclass theClass, jstring dirPath) {
+    jboolean isCopy;
+
+	char * dir_path  = (char*)env->GetStringUTFChars(dirPath, &isCopy);
+    libjsight_init(dir_path);
+    env->ReleaseStringUTFChars(dirPath, dir_path);
+}
+
+/*
+ * Class:     io_jsight_JSight
+ * Method:    Stat
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_io_jsight_JSight_Stat (JNIEnv * env, jclass theClass) {
     return env->NewStringUTF(JSightStat());
 }
 
