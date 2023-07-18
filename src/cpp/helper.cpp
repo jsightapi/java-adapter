@@ -6,29 +6,30 @@ struct Header ** init_Headers(JNIEnv * env, jobject jheaders) {
 	int item_n = 0;
 	if( jheaders != NULL ) {
 
-		printf("In C, about to enter Java\n");
-
 		// java: Set<String> jkey_set = jheaders.keySet();
 		jclass map_class = env->GetObjectClass(jheaders);
 		jmethodID map_keySet_mid = env->GetMethodID(map_class, "keySet", "()Ljava/util/Set;");
 		jobject jkey_set = env->CallObjectMethod(jheaders, map_keySet_mid);
 
-		// java: empty_string_array = new String[0];
-		jobjectArray empty_string_array = env->NewObjectArray(0, env->FindClass("java/lang/String"), NULL);
-
-		// java: String[] jkeys = jkey_set.toArray(empty_string_array)
+		// java: Object[] jkeys = jkey_set.toArray()
 		jclass set_class = env->GetObjectClass(jkey_set);
-		jmethodID map_toArray_mid = env->GetMethodID(set_class, "toArray", "([Ljava/lang/String;)[Ljava/lang/String;");
-		jobject jkeys_object = env->CallObjectMethod(jkey_set, map_toArray_mid, empty_string_array);
-		jobjectArray jkeys = static_cast<jobjectArray>(jkeys_object);
+		jmethodID set_toArray_mid = env->GetMethodID(set_class, "toArray", "()[Ljava/lang/Object;");
+		jobjectArray jkeys = static_cast<jobjectArray>(env->CallObjectMethod(jkey_set, set_toArray_mid));
 
 		jsize keys_count = env->GetArrayLength(jkeys);
 
-		printf("ARRAY LENGTH: %d\n", keys_count);
+		char * buf = new char[1000];
+		sprintf(buf, "ARRAY LENGTH: %d\n", keys_count);
+		println(env, buf);
 
 		for(int i = 0; i < keys_count; i++) {
+			jstring jkey = static_cast<jstring>(env->GetObjectArrayElement(jkeys, i));
+			println(env, jkey);
 
 		}
+
+		free(buf);
+		
 	}
 	
 	return NULL;
@@ -237,3 +238,23 @@ void free_ValidationError(struct ValidationError * error) {
 	free(error->Trace);
 	free(error);
 }*/
+
+
+void println(JNIEnv * env, const char * cstr) {
+    jstring str = env->NewStringUTF(cstr);
+    println(env, str);
+}
+
+void println(JNIEnv * env, jstring str) {
+    jclass system_class = env->FindClass("java/lang/System");
+    jfieldID fid = env->GetStaticFieldID(system_class, "out", "Ljava/io/PrintStream;");
+	// java: out = System.out;
+    jobject out = env->GetStaticObjectField(system_class, fid);
+    jclass out_class = env->GetObjectClass(out);
+    jmethodID mid = env->GetMethodID(out_class, "println", "(Ljava/lang/String;)V");
+	// java: out.println( stat );
+    env->CallVoidMethod(out, mid, str);
+}
+
+
+

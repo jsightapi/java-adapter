@@ -1,5 +1,7 @@
 .PHONY: generate-headers build test
 
+all: build test
+
 generate-headers:
 	cd docker/generate-headers && docker compose up
 

@@ -60,19 +60,23 @@ JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
 {
     jboolean isCopy;
 
-	char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
+    println(env, "===================================================");
+    println(env, "Hello, this World!");
+
+	/*char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
 	char* request_method      = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
-	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy); 
+	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy); */
 
     init_Headers(env, requestHeaders);
 
+/*
     // char* error = JSightValidateHttpRequest(api_spec_file_path, request_method, request_uri, nativeRequestPayload, nativeLogFilePath);
 
     env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path);
     env->ReleaseStringUTFChars(requestMethod  , request_method);
     env->ReleaseStringUTFChars(requestUri     , request_uri);
 
-    // return env->NewStringUTF(error);
+    // return env->NewStringUTF(error);*/
     return NULL;
 }
 

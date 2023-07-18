@@ -1,6 +1,7 @@
 package io.jsight;
 
 import java.util.Map;
+import java.util.List;
 import io.jsight.ValidationError;
 
 public class JSight {

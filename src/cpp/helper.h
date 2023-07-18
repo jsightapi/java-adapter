@@ -13,4 +13,7 @@ struct ValidationError * init_ValidationError(zval * error_zv);
 void free_ValidationError(struct ValidationError * error);
 */ 
 
+void println(JNIEnv * env, const char * str);
+void println(JNIEnv * env, jstring str);
+
 #endif	/* JSIGHT_HELPER_H */
