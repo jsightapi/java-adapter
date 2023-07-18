@@ -34,18 +34,18 @@ JNIEXPORT void JNICALL Java_io_jsight_JSight_ClearCache
 /*
  * Class:     io_jsight_JSight
  * Method:    ValidateHttpRequest
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Lio/jsight/ValidationError;
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;[B)Lio/jsight/ValidationError;
  */
 JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
-  (JNIEnv *, jclass, jstring, jstring, jstring, jobject, jstring);
+  (JNIEnv *, jclass, jstring, jstring, jstring, jobject, jbyteArray);
 
 /*
  * Class:     io_jsight_JSight
  * Method:    ValidateHttpResponse
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/util/Map;Ljava/lang/String;)Lio/jsight/ValidationError;
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/util/Map;[B)Lio/jsight/ValidationError;
  */
 JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpResponse
-  (JNIEnv *, jclass, jstring, jstring, jstring, jint, jobject, jstring);
+  (JNIEnv *, jclass, jstring, jstring, jstring, jint, jobject, jbyteArray);
 
 /*
  * Class:     io_jsight_JSight

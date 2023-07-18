@@ -22,7 +22,7 @@ public class JSight {
     public static native String Stat();
     public static native void ClearCache();
     
-    public static native ValidationError ValidateHttpRequest (String apiSpecFilePath, String requestMethod, String requestUri, Map<String, String[]> requestHeaders, String requestBody);
-    public static native ValidationError ValidateHttpResponse(String apiSpecFilePath, String requestMethod, String requestUri, int responseStatusCode, Map<String, String[]> responseHeaders, String responseBody);
+    public static native ValidationError ValidateHttpRequest (String apiSpecFilePath, String requestMethod, String requestUri, Map<String,List<String>> requestHeaders, byte[] requestBody);
+    public static native ValidationError ValidateHttpResponse(String apiSpecFilePath, String requestMethod, String requestUri, int responseStatusCode, Map<String,List<String>> responseHeaders, byte[] responseBody);
     public static native String SerializeError(String format, ValidationError error);
 }

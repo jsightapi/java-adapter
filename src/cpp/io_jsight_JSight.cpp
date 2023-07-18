@@ -2,7 +2,7 @@
 #include <dlfcn.h>
 #include "io_jsight_JSight.h"
 #include "libjsight_init.h"
-#include "libjsight.h" // Go library .h file.
+#include "helper.h"
 
 /* linked go functions pointers */
 /*char* (*go_func_JapiValidateInput)        (char*, char*, char*, char*, char*);
@@ -51,29 +51,32 @@ JNIEXPORT jstring JNICALL Java_io_jsight_JSight_Stat (JNIEnv * env, jclass theCl
 }
 
 /*
-// ValidateHttpRequest
-JNIEXPORT jstring JNICALL Java_io_jsight_validator_1demo_JSightMonitor_ValidateHttpRequest
-  (JNIEnv * env, jclass theClass, jstring jsightFilePath, jstring requestMethod, jstring requestUri, jstring requestPayload, jstring logFilePath) {
-
+ * Class:     io_jsight_JSight
+ * Method:    ValidateHttpRequest
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Lio/jsight/ValidationError;
+ */
+JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
+  (JNIEnv * env, jclass theClass, jstring apiSpecFilePath, jstring requestMethod, jstring requestUri, jobject requestHeaders, jbyteArray requestBody)
+{
     jboolean isCopy;
 
-	char* nativeJsightFilePath  = (char*)env->GetStringUTFChars(jsightFilePath, &isCopy);
-	char* nativeRequestMethod   = (char*)env->GetStringUTFChars(requestMethod , &isCopy);
-	char* nativeRequestUri      = (char*)env->GetStringUTFChars(requestUri    , &isCopy); 
-	char* nativeRequestPayload  = (char*)env->GetStringUTFChars(requestPayload, &isCopy);
-	char* nativeLogFilePath     = (char*)env->GetStringUTFChars(logFilePath   , &isCopy);
+	char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
+	char* request_method      = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
+	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy); 
 
-    char* error = go_func_JapiValidateInput(nativeJsightFilePath, nativeRequestMethod, nativeRequestUri, nativeRequestPayload, nativeLogFilePath);
+    init_Headers(env, requestHeaders);
 
-    env->ReleaseStringUTFChars(jsightFilePath, nativeJsightFilePath);
-    env->ReleaseStringUTFChars(requestMethod , nativeRequestMethod);
-    env->ReleaseStringUTFChars(requestUri    , nativeRequestUri);
-    env->ReleaseStringUTFChars(requestPayload, nativeRequestPayload);
-    env->ReleaseStringUTFChars(logFilePath   , nativeLogFilePath);
+    // char* error = JSightValidateHttpRequest(api_spec_file_path, request_method, request_uri, nativeRequestPayload, nativeLogFilePath);
 
-    return env->NewStringUTF(error);
+    env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path);
+    env->ReleaseStringUTFChars(requestMethod  , request_method);
+    env->ReleaseStringUTFChars(requestUri     , request_uri);
+
+    // return env->NewStringUTF(error);
+    return NULL;
 }
 
+/*
 // ValidateHttpRequestTimeMks
 JNIEXPORT jint JNICALL Java_io_jsight_validator_1demo_JSightMonitor_ValidateHttpRequestTimeMks
   (JNIEnv * env, jclass theClass, jstring jsightFilePath, jstring requestMethod, jstring requestUri, jstring requestPayload, jstring logFilePath) {
