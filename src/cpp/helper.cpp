@@ -1,10 +1,13 @@
 #include <jni.h>
+#include <list>
 #include "helper.h"
 
 struct Header ** init_Headers(JNIEnv * env, jobject jheaders) {
 	struct Header ** headers = NULL;
 	int item_n = 0;
 	if( jheaders != NULL ) {
+
+		std::list<struct Header *> headers_list = {};
 
 		// java: Set<String> jkey_set = jheaders.keySet();
 		jclass map_class = env->GetObjectClass(jheaders);
@@ -22,11 +25,36 @@ struct Header ** init_Headers(JNIEnv * env, jobject jheaders) {
 		sprintf(buf, "ARRAY LENGTH: %d\n", keys_count);
 		println(env, buf);
 
+		// java: for( jkey: jkeys )
 		for(int i = 0; i < keys_count; i++) {
 			jstring jkey = static_cast<jstring>(env->GetObjectArrayElement(jkeys, i));
 			println(env, jkey);
 
+			// java: List<String> jvalues_list = jheaders.get(jkey)
+			jmethodID map_get_mid = env->GetMethodID(map_class, "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+			jobject jvalues_list = env->CallObjectMethod(jheaders, map_get_mid, jkey);
+
+			// java: String[] jvalues = jvalues_list.toArray();
+			jclass list_class = env->GetObjectClass(jvalues_list);
+			jmethodID list_toArray_mid = env->GetMethodID(list_class, "toArray", "()[Ljava/lang/Object;");
+			jobjectArray jvalues = static_cast<jobjectArray>(env->CallObjectMethod(jvalues_list, list_toArray_mid));
+
+			jsize values_count = env->GetArrayLength(jvalues);
+
+			for(int i = 0; i < values_count; i++) {
+				jstring jvalue = static_cast<jstring>(env->GetObjectArrayElement(jvalues, i));
+				jboolean isCopy;
+				println(env, jvalue);
+				struct Header * header = new Header();
+				header->Name  = (char*)env->GetStringUTFChars(jkey, &isCopy);
+				header->Value = (char*)env->GetStringUTFChars(jvalue, &isCopy);
+
+				headers_list.push_back(header);			
+			}
 		}
+
+		sprintf(buf, "HEADERS LIST LENGTH: %d\n", headers_list.size());
+		println(env, buf);
 
 		free(buf);
 		

@@ -41,6 +41,9 @@ public class AppTest
         xHeaders.add("x-header-value-1");
         xHeaders.add("x-header-value-2");
         requestHeaders.put("X-header", xHeaders);
+        List<String> yHeaders = new ArrayList<String>();
+        yHeaders.add("y-header-value-1");
+        requestHeaders.put("Y-header", yHeaders);
 
         ValidationError error = JSight.ValidateHttpRequest("String apiSpecFilePath", "String requestMethod", "String requestUri", requestHeaders, null);
     }
