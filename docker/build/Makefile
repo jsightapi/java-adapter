@@ -9,9 +9,10 @@ compile:
 	g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -I${SRC_DIR} ${SRC_DIR}/io_jsight_JSight.cpp -o ${BUILD_DIR}/io_jsight_JSight.o
 	g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -I${SRC_DIR} ${SRC_DIR}/libjsight_init.c     -o ${BUILD_DIR}/libjsight_init.o
 	g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -I${SRC_DIR} ${SRC_DIR}/helper.cpp           -o ${BUILD_DIR}/helper.o
+	g++ -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux -I${SRC_DIR} ${SRC_DIR}/jvalidationerrorbox.cpp -o ${BUILD_DIR}/jvalidationerrorbox.o
 
 link:
-	g++ -shared -fPIC -o ${BUILD_DIR}/libjsightjava.so ${BUILD_DIR}/io_jsight_JSight.o ${BUILD_DIR}/libjsight_init.o ${BUILD_DIR}/helper.o -lc
+	g++ -shared -fPIC -o ${BUILD_DIR}/libjsightjava.so ${BUILD_DIR}/io_jsight_JSight.o ${BUILD_DIR}/libjsight_init.o ${BUILD_DIR}/helper.o ${BUILD_DIR}/jvalidationerrorbox.o -lc
 
 clean:
 	rm -rf ${BUILD_DIR} ${JNI_HEADERS_DIR}

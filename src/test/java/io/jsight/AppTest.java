@@ -48,6 +48,6 @@ public class AppTest
 
         ValidationError error = JSight.ValidateHttpRequest("String apiSpecFilePath", "String requestMethod", "String requestUri", requestHeaders, requestBody);
 
-        System.out.printf("Error: %s\n", error.getTitle());
+        System.out.printf("Error: %s\n", error.toJSON());
     }
 }

@@ -4,29 +4,6 @@
 #include "libjsight_init.h"
 #include "helper.h"
 
-/* linked go functions pointers */
-/*char* (*go_func_JapiValidateInput)        (char*, char*, char*, char*, char*);
-int   (*go_func_JapiValidateInputTimeMks) (char*, char*, char*, char*, char*);
-char* (*go_func_JapiValidateOutput)       (char*, char*, char*, int, char*, char*);
-int   (*go_func_JapiValidateOutputTimeMks)(char*, char*, char*, int, char*, char*); 
-
-char* (*go_func_Stat)();
-*/
-/*
-void io_jsight_JSight_init() {
-    libjsight_init();
-
-   	go_func_JapiValidateInput         = (char* (*)(char*, char*, char*, char*, char*     ))dlsym(libjsight_handle, "JapiValidateInput");
-   	go_func_JapiValidateInputTimeMks  = (int   (*)(char*, char*, char*, char*, char*     ))dlsym(libjsight_handle, "JapiValidateInputTimeMks");
-	go_func_JapiValidateOutput        = (char* (*)(char*, char*, char*, int, char*, char*))dlsym(libjsight_handle, "JapiValidateOutput");
-	go_func_JapiValidateOutputTimeMks = (int   (*)(char*, char*, char*, int, char*, char*))dlsym(libjsight_handle, "JapiValidateOutputTimeMks");
-	
-
-    go_func_Stat                  = (char* (*)()                                      )dlsym(libjsight_handle, "Stat");
-
-    return JNI_TRUE;
-} */
-
 /*
  * Class:     io_jsight_JSight
  * Method:    initSharedLibrary
@@ -84,28 +61,35 @@ JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
 }
 
 /*
-// ValidateHttpRequestTimeMks
-JNIEXPORT jint JNICALL Java_io_jsight_validator_1demo_JSightMonitor_ValidateHttpRequestTimeMks
-  (JNIEnv * env, jclass theClass, jstring jsightFilePath, jstring requestMethod, jstring requestUri, jstring requestPayload, jstring logFilePath) {
+ * Class:     io_jsight_JSight
+ * Method:    SerializeError
+ * Signature: (Ljava/lang/String;Lio/jsight/ValidationError;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_io_jsight_JSight_SerializeError
+  (JNIEnv * env, jclass cls, jstring jformat, jobject jerror)
+{
+    // We use JValidationErrorBox here in order to release all the resources,
+    // thanks to its destructor
+    JValidationErrorBox * jerror_box = new JValidationErrorBox( env, jerror );
     jboolean isCopy;
+	char * format  = (char*)env->GetStringUTFChars(jformat, &isCopy);
 
-	char* nativeJsightFilePath  = (char*)env->GetStringUTFChars(jsightFilePath, &isCopy);
-	char* nativeRequestMethod   = (char*)env->GetStringUTFChars(requestMethod , &isCopy);
-	char* nativeRequestUri      = (char*)env->GetStringUTFChars(requestUri    , &isCopy); 
-	char* nativeRequestPayload  = (char*)env->GetStringUTFChars(requestPayload, &isCopy);
-	char* nativeLogFilePath     = (char*)env->GetStringUTFChars(logFilePath   , &isCopy);
+    char * json = JSightSerializeError(format, jerror_box->getValidationError());
+    jstring jjson = env->NewStringUTF(json);
 
-    int timeMks = go_func_JapiValidateInputTimeMks(nativeJsightFilePath, nativeRequestMethod, nativeRequestUri, nativeRequestPayload, nativeLogFilePath);
+    // free resources
+    env->ReleaseStringUTFChars(jformat, format);
+    delete(jerror_box);
+    free(json);
 
-    env->ReleaseStringUTFChars(jsightFilePath, nativeJsightFilePath);
-    env->ReleaseStringUTFChars(requestMethod , nativeRequestMethod);
-    env->ReleaseStringUTFChars(requestUri    , nativeRequestUri);
-    env->ReleaseStringUTFChars(requestPayload, nativeRequestPayload);
-    env->ReleaseStringUTFChars(logFilePath   , nativeLogFilePath);
-
-    return (jint) timeMks;
+    return jjson;
 }
 
+
+
+
+
+/*
 // ValidateHttpResponse
 JNIEXPORT jstring JNICALL Java_io_jsight_validator_1demo_JSightMonitor_ValidateHttpResponse
   (JNIEnv * env, jclass theClass, jstring jsightFilePath, jstring requestMethod, jstring requestUri, jint responseStatusCode, jstring responsePayload, jstring logFilePath) {
@@ -129,26 +113,4 @@ JNIEXPORT jstring JNICALL Java_io_jsight_validator_1demo_JSightMonitor_ValidateH
     return env->NewStringUTF(error);
 }
 
-// ValidateHttpResponseTimeMks
-JNIEXPORT jint JNICALL Java_io_jsight_validator_1demo_JSightMonitor_ValidateHttpResponseTimeMks
-  (JNIEnv * env, jclass theClass, jstring jsightFilePath, jstring requestMethod, jstring requestUri, jint responseStatusCode, jstring responsePayload, jstring logFilePath) {
-
-    jboolean isCopy;
-
-	char* nativeJsightFilePath  = (char*)env->GetStringUTFChars(jsightFilePath , &isCopy);
-	char* nativeRequestMethod   = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
-	char* nativeRequestUri      = (char*)env->GetStringUTFChars(requestUri     , &isCopy); 
-	char* nativeResponsePayload = (char*)env->GetStringUTFChars(responsePayload, &isCopy);
-	char* nativeLogFilePath     = (char*)env->GetStringUTFChars(logFilePath    , &isCopy);
-
-    int timeMks = go_func_JapiValidateOutputTimeMks(nativeJsightFilePath, nativeRequestMethod, nativeRequestUri, (int)responseStatusCode, nativeResponsePayload, nativeLogFilePath);
-
-    env->ReleaseStringUTFChars(jsightFilePath , nativeJsightFilePath);
-    env->ReleaseStringUTFChars(requestMethod  , nativeRequestMethod);
-    env->ReleaseStringUTFChars(requestUri     , nativeRequestUri);
-    env->ReleaseStringUTFChars(responsePayload, nativeResponsePayload);
-    env->ReleaseStringUTFChars(logFilePath    , nativeLogFilePath);
-
-    return (jint)timeMks;
-}
 */
