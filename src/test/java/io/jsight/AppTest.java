@@ -44,7 +44,8 @@ public class AppTest
         List<String> yHeaders = new ArrayList<String>();
         yHeaders.add("y-header-value-1");
         requestHeaders.put("Y-header", yHeaders);
+        byte[] requestBody = "the body".getBytes();
 
-        ValidationError error = JSight.ValidateHttpRequest("String apiSpecFilePath", "String requestMethod", "String requestUri", requestHeaders, null);
+        ValidationError error = JSight.ValidateHttpRequest("String apiSpecFilePath", "String requestMethod", "String requestUri", requestHeaders, requestBody);
     }
 }

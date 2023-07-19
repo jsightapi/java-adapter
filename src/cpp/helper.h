@@ -4,8 +4,9 @@
 #include <jni.h>
 #include "libjsight.h" // Go library .h file.
 
-struct Header ** init_Headers(JNIEnv * env, jobject jheaders);
-// void free_Headers(struct Header ** headers);
+struct Header ** init_headers(JNIEnv * env, jobject jheaders);
+void free_headers(struct Header ** headers);
+char * jbyte_array_to_c_str(JNIEnv * env, jbyteArray jbytes);
 
 /*void set_return_value_error(zval * return_value, struct ValidationError * error);
 

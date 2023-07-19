@@ -1,10 +1,10 @@
 #include <jni.h>
 #include <list>
+#include <cstring>
 #include "helper.h"
 
-struct Header ** init_Headers(JNIEnv * env, jobject jheaders) {
+struct Header ** init_headers(JNIEnv * env, jobject jheaders) {
 	struct Header ** headers = NULL;
-	int item_n = 0;
 	if( jheaders != NULL ) {
 
 		std::list<struct Header *> headers_list = {};
@@ -21,14 +21,9 @@ struct Header ** init_Headers(JNIEnv * env, jobject jheaders) {
 
 		jsize keys_count = env->GetArrayLength(jkeys);
 
-		char * buf = new char[1000];
-		sprintf(buf, "ARRAY LENGTH: %d\n", keys_count);
-		println(env, buf);
-
 		// java: for( jkey: jkeys )
 		for(int i = 0; i < keys_count; i++) {
 			jstring jkey = static_cast<jstring>(env->GetObjectArrayElement(jkeys, i));
-			println(env, jkey);
 
 			// java: List<String> jvalues_list = jheaders.get(jkey)
 			jmethodID map_get_mid = env->GetMethodID(map_class, "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
@@ -44,7 +39,6 @@ struct Header ** init_Headers(JNIEnv * env, jobject jheaders) {
 			for(int i = 0; i < values_count; i++) {
 				jstring jvalue = static_cast<jstring>(env->GetObjectArrayElement(jvalues, i));
 				jboolean isCopy;
-				println(env, jvalue);
 				struct Header * header = new Header();
 				header->Name  = (char*)env->GetStringUTFChars(jkey, &isCopy);
 				header->Value = (char*)env->GetStringUTFChars(jvalue, &isCopy);
@@ -53,65 +47,26 @@ struct Header ** init_Headers(JNIEnv * env, jobject jheaders) {
 			}
 		}
 
-		sprintf(buf, "HEADERS LIST LENGTH: %d\n", headers_list.size());
-		println(env, buf);
+		// char * buf = new char[1000];
+		// sprintf(buf, "HEADERS LIST LENGTH: %d\n", headers_list.size());
+		// println(env, buf);
+		// free(buf);
 
-		free(buf);
-		
+		headers = (struct Header **)malloc(sizeof(struct Header *) * (headers_list.size() + 1)); // Plus one place for NULL termination.
+		int i = 0;
+		for(struct Header * h : headers_list) {
+			headers[i] = h;
+			// println(env, h->Name);
+			// println(env, h->Value);
+			i++;
+		}
+		headers[i] = NULL; // Last element must be NULL
 	}
 	
-	return NULL;
-
-
-		/*
-
-		HashTable* headers_ht = Z_ARR_P(headers_zv);
-		int headers_count = zend_hash_num_elements(headers_ht);
-
-		headers = malloc(sizeof(struct Header *) * (headers_count + 1)); // Plus one place for NULL termination.
-
-		zend_ulong num_key;
-		zend_string * str_key;
-		zval * item_zv;
-
-		ZEND_HASH_FOREACH_KEY_VAL(headers_ht, num_key, str_key, item_zv) {
-			if( str_key == NULL || Z_TYPE_P(item_zv) == IS_NULL ) {
-				continue;
-			}
-
-			if( Z_TYPE_P(item_zv) == IS_ARRAY ) {
-				HashTable* items_ht = Z_ARR_P(item_zv);
-
-				if( zend_hash_num_elements(items_ht) == 0 ) {
-					continue;
-				}
-
-				if( zend_hash_index_exists(items_ht, 0) == 0 ) {
-					continue;
-				}
-
-				item_zv = zend_hash_index_find(items_ht, 0);
-			}
-
-			if( Z_TYPE_P(item_zv) != IS_STRING ) {
-				continue;
-			}
-
-			headers[item_n] = malloc(sizeof(struct Header));
-			headers[item_n]->Name = ZSTR_VAL(str_key);
-			headers[item_n]->Value = Z_STRVAL_P(item_zv);
-
-			item_n ++;
-		} ZEND_HASH_FOREACH_END();
-
-		headers[item_n] = NULL; // NULL termination
-	}
 	return headers;
-	*/
 }
 
-/*
-void free_Headers(struct Header ** headers) {
+void free_headers(struct Header ** headers) {
 	if( headers != NULL ) {
 		int i = 0;
 		while(headers[i] != NULL) {
@@ -120,6 +75,18 @@ void free_Headers(struct Header ** headers) {
 		}
 		free(headers);
 	}
+}
+
+char * jbyte_array_to_c_str(JNIEnv * env, jbyteArray jbytes) {
+	if( jbytes == NULL ) return NULL;
+	jsize num_bytes = env->GetArrayLength(jbytes);
+	char * buffer = (char *) malloc(num_bytes + 1);
+	jboolean isCopy;
+	jbyte * elements = env->GetByteArrayElements(jbytes, &isCopy);
+	memcpy(buffer, elements, num_bytes);
+	buffer[num_bytes] = 0; // the last element must be NULL
+	env->ReleaseByteArrayElements(jbytes, elements, JNI_ABORT);
+	return buffer;
 }
 
 /*void set_return_value_error(zval * return_value, struct ValidationError * error) {

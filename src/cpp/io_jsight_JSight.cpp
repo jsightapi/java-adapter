@@ -63,21 +63,25 @@ JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
     println(env, "===================================================");
     println(env, "Hello, this World!");
 
-	/*char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
+	char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
 	char* request_method      = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
-	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy); */
+	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy);
 
-    init_Headers(env, requestHeaders);
-
-/*
-    // char* error = JSightValidateHttpRequest(api_spec_file_path, request_method, request_uri, nativeRequestPayload, nativeLogFilePath);
-
+    struct Header** request_headers = init_headers(env, requestHeaders);
+    char * request_body = jbyte_array_to_c_str(env, requestBody);
+    struct ValidationError * error = JSightValidateHttpRequest(api_spec_file_path, request_method, request_uri, request_headers, request_body);
     env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path);
     env->ReleaseStringUTFChars(requestMethod  , request_method);
     env->ReleaseStringUTFChars(requestUri     , request_uri);
+    free_headers(request_headers);
+    if( request_body != NULL ) free(request_body);
+    
+    if( error == NULL ) return NULL;
 
-    // return env->NewStringUTF(error);*/
-    return NULL;
+    println(env, error->Type);
+    println(env, error->Title);
+    println(env, error->Detail);
+    free(error);
 }
 
 /*
