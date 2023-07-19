@@ -60,28 +60,27 @@ JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
 {
     jboolean isCopy;
 
-    println(env, "===================================================");
-    println(env, "Hello, this World!");
-
 	char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
 	char* request_method      = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
 	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy);
 
     struct Header** request_headers = init_headers(env, requestHeaders);
-    char * request_body = jbyte_array_to_c_str(env, requestBody);
+    char * request_body = init_body(env, requestBody);
     struct ValidationError * error = JSightValidateHttpRequest(api_spec_file_path, request_method, request_uri, request_headers, request_body);
     env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path);
     env->ReleaseStringUTFChars(requestMethod  , request_method);
     env->ReleaseStringUTFChars(requestUri     , request_uri);
     free_headers(request_headers);
-    if( request_body != NULL ) free(request_body);
-    
+    free_body(request_body);
+     
     if( error == NULL ) return NULL;
 
-    println(env, error->Type);
-    println(env, error->Title);
-    println(env, error->Detail);
-    free(error);
+    // println(env, error->Title);
+    jobject jerror = new_jValidationError(env, error);
+    
+    freeValidationError(error);
+
+    return jerror;
 }
 
 /*

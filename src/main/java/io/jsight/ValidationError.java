@@ -51,7 +51,7 @@ public class ValidationError {
         return this.trace;
     }
 
-    public String ToJSON() {
+    public String toJSON() {
         return JSight.SerializeError("json", this);
     }
 }

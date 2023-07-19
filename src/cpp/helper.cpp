@@ -89,6 +89,81 @@ char * jbyte_array_to_c_str(JNIEnv * env, jbyteArray jbytes) {
 	return buffer;
 }
 
+char * init_body(JNIEnv * env, jbyteArray body) {
+	return jbyte_array_to_c_str(env, body);
+}
+
+void free_body(char * body) {
+	if( body != NULL ) free(body);
+}
+
+jobject new_jValidationError(JNIEnv * env, struct ValidationError * error) {
+	if( error == NULL ) return NULL;
+
+	jclass integer_class = env->FindClass("java/lang/Integer");
+	jmethodID integer_ctor_mid = env->GetMethodID(integer_class, "<init>", "(I)V");
+
+	// making ErrorPosition
+	jclass error_position_class = env->FindClass("io/jsight/ErrorPosition");
+	jmethodID error_position_ctor_mid = env->GetMethodID(
+		error_position_class, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+
+	jobject jErrorPosition = NULL;
+	struct ErrorPosition * position = error->Position;
+	if( position != NULL ) {
+		jobject jline = NULL;
+		if( position->Line != NULL ) {
+			jline = env->NewObject(integer_class, integer_ctor_mid, *position->Line);
+		}
+
+		jobject jcol = NULL;
+		if( position->Col != NULL ) {
+			jcol = env->NewObject(integer_class, integer_ctor_mid, *position->Col);
+		}
+
+		jobject jindex = NULL;
+		if( position->Index != NULL ) {
+			jindex = env->NewObject(integer_class, integer_ctor_mid, *position->Index);
+		}
+
+		jErrorPosition = env->NewObject(error_position_class, error_position_ctor_mid,
+			env->NewStringUTF(error->Position->Filepath), jline, jcol, jindex);
+	}
+
+	jclass validation_error_class = env->FindClass("io/jsight/ValidationError");
+	jmethodID validation_error_ctor_mid = env->GetMethodID(
+		validation_error_class, "<init>", "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Lio/jsight/ErrorPosition;[Ljava/lang/String;)V");
+
+	jobjectArray jtrace = NULL;
+
+	if( error->Trace != NULL ) {
+		int i = 0;
+		while(error->Trace[i]) {
+			i++;
+		}
+		int trace_size = i;
+		jclass string_class = env->FindClass("java/lang/String");
+		
+		jtrace = env->NewObjectArray(trace_size, string_class, env->NewStringUTF(""));
+
+		for(i=0; i < trace_size; i++) {
+			env->SetObjectArrayElement(jtrace, i, env->NewStringUTF(error->Trace[i]));
+		}
+	}
+
+	jobject jValidationError = env->NewObject(validation_error_class, validation_error_ctor_mid,
+		env->NewStringUTF(error->ReportedBy),
+		env->NewStringUTF(error->Type),
+		error->Code,
+		env->NewStringUTF(error->Title),
+		env->NewStringUTF(error->Detail),
+		jErrorPosition,
+		jtrace
+	);
+	
+	return jValidationError;
+}
+
 /*void set_return_value_error(zval * return_value, struct ValidationError * error) {
 	array_init_size(return_value, 7);
 

@@ -6,7 +6,11 @@
 
 struct Header ** init_headers(JNIEnv * env, jobject jheaders);
 void free_headers(struct Header ** headers);
-char * jbyte_array_to_c_str(JNIEnv * env, jbyteArray jbytes);
+char * init_body(JNIEnv * env, jbyteArray jbytes);
+void free_body(char * body);
+
+jobject new_jValidationError(JNIEnv * env, struct ValidationError * error);
+
 
 /*void set_return_value_error(zval * return_value, struct ValidationError * error);
 
