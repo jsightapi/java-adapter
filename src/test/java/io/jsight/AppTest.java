@@ -9,30 +9,48 @@ import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.io.File;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.json.JSONException;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
+public class AppTest
 {
+    private static String testSpecPath = "";
+
     static {
         JSight.Init();
-    }
 
-    /**
-     * Rigorous Test :-)
-     */
-    @Test
-    public void shouldAnswerWithTrue()
-    {
-        assertTrue( true );
+        String testSpecName = "test.jst";
+
+        ClassLoader classLoader = AppTest.class.getClassLoader();
+        File specFile = new File(classLoader.getResource(testSpecName).getFile());
+        testSpecPath = specFile.getAbsolutePath();
+        System.out.printf("Test specification file: %s\n", testSpecPath);
     }
 
     @Test
-    public void testJSightStat() {
+    public void testStat() {
         String stat = JSight.Stat();
-        System.out.println( stat );
+        // System.out.println( stat );
         assertNotNull( stat );
+    }
+
+    @Test
+    public void testApiSpecError() throws JSONException {
+        ValidationError error = JSight.ValidateHttpRequest("not-existing-api-spec.jst", "GET", "/users", null, null);
+        String expected = ""
+            + " {                                                  "
+            + "    \"reportedBy1\": \"HTTP Request validation\",    "
+            + "    \"type\": \"api_spec_error\",                   "
+            + "    \"code\": 10001,                                "
+            + "    \"title\": \"API spec file not found\",         "
+            + "    \"detail\": \"\",                               "
+            + "    \"position\": {                                 "
+            + "        \"filepath\": \"not-existing-api-spec.jst\" "
+            + "    }                                               "
+            + " }                                                  ";
+        JSONAssert.assertEquals(expected, error.toJSON(), JSONCompareMode.STRICT);
     }
 
     @Test
@@ -47,9 +65,9 @@ public class AppTest
         requestHeaders.put("Y-header", yHeaders);
         byte[] requestBody = "the body".getBytes();
 
-        ValidationError error = JSight.ValidateHttpRequest("String apiSpecFilePath", "String requestMethod", "String requestUri", requestHeaders, requestBody);
+        ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "String requestMethod", "String requestUri", requestHeaders, requestBody);
 
-        System.out.printf("Error: %s\n", error.toJSON());
+        System.out.printf("Error:\n%s\n", error.toJSON());
     }
 
     @Test
@@ -64,8 +82,8 @@ public class AppTest
         responseHeaders.put("Y-header", yHeaders);
         byte[] responseBody = "the body".getBytes();
 
-        ValidationError error = JSight.ValidateHttpResponse("String apiSpecFilePath", "String requestMethod", "String requestUri", 200, responseHeaders, responseBody);
+        ValidationError error = JSight.ValidateHttpResponse(this.testSpecPath, "String requestMethod", "String requestUri", 200, responseHeaders, responseBody);
 
-        System.out.printf("Error: %s\n", error.toJSON());
+        System.out.printf("Error:\n%s\n", error.toJSON());
     }
 }
