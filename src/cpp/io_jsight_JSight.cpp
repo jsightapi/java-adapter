@@ -62,6 +62,39 @@ JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
 
 /*
  * Class:     io_jsight_JSight
+ * Method:    ValidateHttpResponse
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/util/Map;[B)Lio/jsight/ValidationError;
+ */
+JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpResponse
+  (JNIEnv * env, jclass, jstring apiSpecFilePath, jstring requestMethod, jstring requestUri, jint responseStatusCode, jobject responseHeaders, jbyteArray responseBody) 
+{
+    jboolean isCopy;
+
+	char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
+	char* request_method      = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
+	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy);
+
+    struct Header** response_headers = init_headers(env, responseHeaders);
+    char * response_body = init_body(env, responseBody);
+    struct ValidationError * error = JSightValidateHttpResponse(api_spec_file_path, request_method, request_uri, responseStatusCode, response_headers, response_body);
+    env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path);
+    env->ReleaseStringUTFChars(requestMethod  , request_method);
+    env->ReleaseStringUTFChars(requestUri     , request_uri);
+    free_headers(response_headers);
+    free_body(response_body);
+     
+    if( error == NULL ) return NULL;
+
+    // println(env, error->Title);
+    jobject jerror = new_jValidationError(env, error);
+    
+    freeValidationError(error);
+
+    return jerror;
+}
+
+/*
+ * Class:     io_jsight_JSight
  * Method:    SerializeError
  * Signature: (Ljava/lang/String;Lio/jsight/ValidationError;)Ljava/lang/String;
  */
@@ -84,33 +117,3 @@ JNIEXPORT jstring JNICALL Java_io_jsight_JSight_SerializeError
 
     return jjson;
 }
-
-
-
-
-
-/*
-// ValidateHttpResponse
-JNIEXPORT jstring JNICALL Java_io_jsight_validator_1demo_JSightMonitor_ValidateHttpResponse
-  (JNIEnv * env, jclass theClass, jstring jsightFilePath, jstring requestMethod, jstring requestUri, jint responseStatusCode, jstring responsePayload, jstring logFilePath) {
-
-    jboolean isCopy;
-
-	char* nativeJsightFilePath  = (char*)env->GetStringUTFChars(jsightFilePath , &isCopy);
-	char* nativeRequestMethod   = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
-	char* nativeRequestUri      = (char*)env->GetStringUTFChars(requestUri     , &isCopy); 
-	char* nativeResponsePayload = (char*)env->GetStringUTFChars(responsePayload, &isCopy);
-	char* nativeLogFilePath     = (char*)env->GetStringUTFChars(logFilePath    , &isCopy);
-
-    char* error = go_func_JapiValidateOutput(nativeJsightFilePath, nativeRequestMethod, nativeRequestUri, (int)responseStatusCode, nativeResponsePayload, nativeLogFilePath);
-
-    env->ReleaseStringUTFChars(jsightFilePath , nativeJsightFilePath);
-    env->ReleaseStringUTFChars(requestMethod  , nativeRequestMethod);
-    env->ReleaseStringUTFChars(requestUri     , nativeRequestUri);
-    env->ReleaseStringUTFChars(responsePayload, nativeResponsePayload);
-    env->ReleaseStringUTFChars(logFilePath    , nativeLogFilePath);
-
-    return env->NewStringUTF(error);
-}
-
-*/

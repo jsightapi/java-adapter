@@ -179,6 +179,3 @@ void println(JNIEnv * env, jstring str) {
 	// java: out.println( stat );
     env->CallVoidMethod(out, mid, str);
 }
-
-
-
