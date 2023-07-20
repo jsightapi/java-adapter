@@ -2,6 +2,7 @@ package io.jsight;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import io.jsight.JSight;
@@ -59,7 +60,7 @@ public class AppTest
     }
 
     @Test
-    public void testBodyError() throws JSONException {
+    public void testRequestError() throws JSONException {
         Map headers = new HashMap<String, List<String>>();
         List<String> values = new ArrayList<String>();
         values.add("application/json");
@@ -83,22 +84,89 @@ public class AppTest
         JSONAssert.assertEquals(expected, error.toJSON(), JSONCompareMode.STRICT);
     }
 
+    @Test
+    public void testResponseError() throws JSONException {
+        Map headers = new HashMap<String, List<String>>();
+        List<String> values = new ArrayList<String>();
+        values.add("application/json");
+        headers.put("Content-Type", values);
+        byte[] body = "{\"id1\": 123, \"name\": \"John\"}".getBytes();
+        ValidationError error = JSight.ValidateHttpResponse(this.testSpecPath, "POST", "/users", 200, headers, body);
+        // System.out.printf("String expected = \"\"\n%sn", error.toJSON());
+        String expected = ""
+            + "{                                                           \n"
+            + "  \"reportedBy\": \"HTTP Response validation\",              \n"
+            + "  \"type\": \"http_body_error\",                            \n"
+            + "  \"code\": 32001,                                          \n"
+            + "  \"title\": \"HTTP body error\",                           \n"
+            + "  \"detail\": \"Schema does not support key \\\"id1\\\"\",  \n"
+            + "  \"position\": {                                           \n"
+            + "    \"index\": 1,                                           \n"
+            + "    \"line\": 1,                                            \n"
+            + "    \"col\": 2                                              \n"
+            + "  }                                                         \n"
+            + "}                                                           \n";
+        JSONAssert.assertEquals(expected, error.toJSON(), JSONCompareMode.STRICT);
+    }
 
     @Test
-    public void ValidateHttpRequest() {
-        Map requestHeaders = new HashMap<String, List<String>>();
-        List<String> xHeaders = new ArrayList<String>();
-        xHeaders.add("x-header-value-1");
-        xHeaders.add("x-header-value-2");
-        requestHeaders.put("X-header", xHeaders);
-        List<String> yHeaders = new ArrayList<String>();
-        yHeaders.add("y-header-value-1");
-        requestHeaders.put("Y-header", yHeaders);
-        byte[] requestBody = "the body".getBytes();
+    public void testSerializeError() throws JSONException {
+        ValidationError error = new ValidationError(
+            "reportedBy", "type", 0, "title", "detail",
+            new ErrorPosition("filePath", 1, 2, 3),
+            new String[] {"one", "two", "three"}
+        );
+        // System.out.printf("String expected = \"\"\n%sn", error.toJSON());
+        String expected = ""
+            + " {                                   \n"
+            + "   \"reportedBy\": \"reportedBy\",   \n"
+            + "   \"type\": \"type\",               \n"
+            + "   \"code\": 0,                      \n"
+            + "   \"title\": \"title\",             \n"
+            + "   \"detail\": \"detail\",           \n"
+            + "   \"position\": {                   \n"
+            + "     \"filepath\": \"filePath\",     \n"
+            + "     \"index\": 3,                   \n"
+            + "     \"line\": 1,                    \n"
+            + "     \"col\": 2                      \n"
+            + "   },                                \n"
+            + "   \"trace\": [                      \n"
+            + "     \"one\",                        \n"
+            + "     \"two\",                        \n"
+            + "     \"three\"                       \n"
+            + "   ]                                 \n"
+            + "}                                    \n";
+        JSONAssert.assertEquals(expected, error.toJSON(), JSONCompareMode.STRICT);
+    }
 
-        ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "String requestMethod", "String requestUri", requestHeaders, requestBody);
+    @Test
+    public void testSuccessfulRequest() throws JSONException {
+        Map headers = new HashMap<String, List<String>>();
+        List<String> values = new ArrayList<String>();
+        values.add("application/json");
+        headers.put("Content-Type", values);
+        byte[] body = "{\"id\": 123, \"name\": \"John\"}".getBytes();
+        ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "POST", "/users", headers, body);
+        assertNull(error);
+    }
 
-        //System.out.printf("Error:\n%s\n", error.toJSON());
+    @Test
+    public void testSuccessfulResponse() throws JSONException {
+        Map headers = new HashMap<String, List<String>>();
+        List<String> values = new ArrayList<String>();
+        values.add("application/json");
+        headers.put("Content-Type", values);
+        byte[] body = "{\"id\": 123, \"name\": \"John\"}".getBytes();
+        ValidationError error = JSight.ValidateHttpResponse(this.testSpecPath, "POST", "/users", 200, headers, body);
+        assertNull(error);
+    }
+
+    @Test
+    public void testEmptyHeadersAndBodies() throws JSONException {
+        ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "GET", "/users", null, null);
+        assertNull(error);
+        error = JSight.ValidateHttpRequest(this.testSpecPath, "GET", "/users", new HashMap<String, List<String>>(), new byte[0]);
+        assertNull(error);
     }
 
     @Test

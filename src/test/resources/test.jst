@@ -16,10 +16,15 @@ URL /users
           "name": "John"
         }
     200
-      {
-        "id": 123,
-        "name": "John"
-      }
+      Headers
+        {
+          "Content-Type": "application/json" // {const: true}
+        }
+      Body
+        {
+          "id": 123,
+          "name": "John"
+        }
   DELETE
     204 any
 
