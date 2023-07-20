@@ -37,11 +37,16 @@ public class AppTest
     }
 
     @Test
+    public void testClearCache() {
+        JSight.ClearCache();
+    }
+
+    @Test
     public void testApiSpecError() throws JSONException {
         ValidationError error = JSight.ValidateHttpRequest("not-existing-api-spec.jst", "GET", "/users", null, null);
         String expected = ""
             + " {                                                  "
-            + "    \"reportedBy1\": \"HTTP Request validation\",    "
+            + "    \"reportedBy\": \"HTTP Request validation\",    "
             + "    \"type\": \"api_spec_error\",                   "
             + "    \"code\": 10001,                                "
             + "    \"title\": \"API spec file not found\",         "
@@ -52,6 +57,32 @@ public class AppTest
             + " }                                                  ";
         JSONAssert.assertEquals(expected, error.toJSON(), JSONCompareMode.STRICT);
     }
+
+    @Test
+    public void testBodyError() throws JSONException {
+        Map headers = new HashMap<String, List<String>>();
+        List<String> values = new ArrayList<String>();
+        values.add("application/json");
+        headers.put("Content-Type", values);
+        byte[] body = "{\"id1\": 123, \"name\": \"John\"}".getBytes();
+        ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "POST", "/users", headers, body);
+        // System.out.printf("String expected = \"\"\n%sn", error.toJSON());
+        String expected = ""
+            + "{                                                           \n"
+            + "  \"reportedBy\": \"HTTP Request validation\",              \n"
+            + "  \"type\": \"http_body_error\",                            \n"
+            + "  \"code\": 32001,                                          \n"
+            + "  \"title\": \"HTTP body error\",                           \n"
+            + "  \"detail\": \"Schema does not support key \\\"id1\\\"\",  \n"
+            + "  \"position\": {                                           \n"
+            + "    \"index\": 1,                                           \n"
+            + "    \"line\": 1,                                            \n"
+            + "    \"col\": 2                                              \n"
+            + "  }                                                         \n"
+            + "}                                                           \n";
+        JSONAssert.assertEquals(expected, error.toJSON(), JSONCompareMode.STRICT);
+    }
+
 
     @Test
     public void ValidateHttpRequest() {
@@ -67,7 +98,7 @@ public class AppTest
 
         ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "String requestMethod", "String requestUri", requestHeaders, requestBody);
 
-        System.out.printf("Error:\n%s\n", error.toJSON());
+        //System.out.printf("Error:\n%s\n", error.toJSON());
     }
 
     @Test
@@ -84,6 +115,6 @@ public class AppTest
 
         ValidationError error = JSight.ValidateHttpResponse(this.testSpecPath, "String requestMethod", "String requestUri", 200, responseHeaders, responseBody);
 
-        System.out.printf("Error:\n%s\n", error.toJSON());
+        //System.out.printf("Error:\n%s\n", error.toJSON());
     }
 }

@@ -20,6 +20,15 @@ JNIEXPORT void JNICALL Java_io_jsight_JSight_initSharedLibrary
 
 /*
  * Class:     io_jsight_JSight
+ * Method:    ClearCache
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_io_jsight_JSight_ClearCache(JNIEnv *, jclass) {
+    JSightClearCache();
+}
+
+/*
+ * Class:     io_jsight_JSight
  * Method:    Stat
  * Signature: ()Ljava/lang/String;
  */
