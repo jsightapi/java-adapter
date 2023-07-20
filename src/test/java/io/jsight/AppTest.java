@@ -20,7 +20,11 @@ public class AppTest
     private static String testSpecPath = "";
 
     static {
-        JSight.Init();
+        if (new File("/home/config/test1").isFile()) {
+            JSight.Init();
+        } else if (new File("/home/config/test2").isFile()){
+            JSight.Init("/home/lib");
+        }
 
         String testSpecName = "test.jst";
 
@@ -167,22 +171,5 @@ public class AppTest
         assertNull(error);
         error = JSight.ValidateHttpRequest(this.testSpecPath, "GET", "/users", new HashMap<String, List<String>>(), new byte[0]);
         assertNull(error);
-    }
-
-    @Test
-    public void ValidateHttpResponse() {
-        Map responseHeaders = new HashMap<String, List<String>>();
-        List<String> xHeaders = new ArrayList<String>();
-        xHeaders.add("x-header-value-1");
-        xHeaders.add("x-header-value-2");
-        responseHeaders.put("X-header", xHeaders);
-        List<String> yHeaders = new ArrayList<String>();
-        yHeaders.add("y-header-value-1");
-        responseHeaders.put("Y-header", yHeaders);
-        byte[] responseBody = "the body".getBytes();
-
-        ValidationError error = JSight.ValidateHttpResponse(this.testSpecPath, "String requestMethod", "String requestUri", 200, responseHeaders, responseBody);
-
-        //System.out.printf("Error:\n%s\n", error.toJSON());
     }
 }

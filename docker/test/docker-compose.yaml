@@ -1,14 +1,27 @@
 version: '3.1'
 services:
-  headers:
+  test1:
     build: 
       context: ./../../
       dockerfile: ./docker/test/Dockerfile
-    container_name: java_lib_test
+    container_name: java_lib_test_1
     volumes:
       - ./../../:/app
       - ./../../jsight-lib/1.0.0:/usr/local/lib
       - ./../../build:/usr/java/packages/lib
+      - ./config1/:/home/config
     working_dir: /app
     command: mvn test
     
+  test2: # the difference between test1 and test2 is in the libjsight.so folder.
+    build: 
+      context: ./../../
+      dockerfile: ./docker/test/Dockerfile
+    container_name: java_lib_test_2
+    volumes:
+      - ./../../:/app
+      - ./../../jsight-lib/1.0.0:/home/lib
+      - ./../../build:/usr/java/packages/lib
+      - ./config2/:/home/config
+    working_dir: /app
+    command: mvn test 
