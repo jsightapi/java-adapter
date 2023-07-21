@@ -14,6 +14,8 @@ jobject new_jValidationError(JNIEnv * env, struct ValidationError * error);
 struct ValidationError * init_validation_error(JNIEnv * env, jobject jerror);
 void free_ValidationError(struct ValidationError * error);
 
+char * empty_string();
+
 void println(JNIEnv * env, const char * str);
 void println(JNIEnv * env, jstring str);
 

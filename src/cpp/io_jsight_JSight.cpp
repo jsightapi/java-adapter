@@ -46,16 +46,33 @@ JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpRequest
 {
     jboolean isCopy;
 
-	char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
-	char* request_method      = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
-	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy);
+    char* api_spec_file_path  = NULL;
+    char* request_method      = NULL;
+    char* request_uri         = NULL;    
+
+    if( apiSpecFilePath == NULL ) { api_spec_file_path = empty_string(); } 
+    else { api_spec_file_path = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);}
+
+    if( requestMethod == NULL ) { request_method = empty_string(); } 
+    else { request_method = (char*)env->GetStringUTFChars(requestMethod, &isCopy);}
+
+    if( requestUri == NULL ) { request_uri = empty_string(); }
+	else { request_uri = (char*)env->GetStringUTFChars(requestUri, &isCopy);}
 
     struct Header** request_headers = init_headers(env, requestHeaders);
     char * request_body = init_body(env, requestBody);
+
+    // call function
     struct ValidationError * error = JSightValidateHttpRequest(api_spec_file_path, request_method, request_uri, request_headers, request_body);
-    env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path);
-    env->ReleaseStringUTFChars(requestMethod  , request_method);
-    env->ReleaseStringUTFChars(requestUri     , request_uri);
+
+    // free resources
+    if( apiSpecFilePath == NULL ) {free(api_spec_file_path);}
+    else { env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path); } 
+    if( requestMethod == NULL ) {free(request_method);}
+    else { env->ReleaseStringUTFChars(requestMethod, request_method); } 
+    if( requestUri == NULL ) {free(request_uri);}
+    else { env->ReleaseStringUTFChars(requestUri, request_uri); }
+    
     free_headers(request_headers);
     free_body(request_body);
      
@@ -79,16 +96,33 @@ JNIEXPORT jobject JNICALL Java_io_jsight_JSight_ValidateHttpResponse
 {
     jboolean isCopy;
 
-	char* api_spec_file_path  = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);
-	char* request_method      = (char*)env->GetStringUTFChars(requestMethod  , &isCopy);
-	char* request_uri         = (char*)env->GetStringUTFChars(requestUri     , &isCopy);
+    char* api_spec_file_path  = NULL;
+    char* request_method      = NULL;
+    char* request_uri         = NULL;    
+
+    if( apiSpecFilePath == NULL ) { api_spec_file_path = empty_string(); } 
+    else { api_spec_file_path = (char*)env->GetStringUTFChars(apiSpecFilePath, &isCopy);}
+
+    if( requestMethod == NULL ) { request_method = empty_string(); } 
+    else { request_method = (char*)env->GetStringUTFChars(requestMethod, &isCopy);}
+
+    if( requestUri == NULL ) { request_uri = empty_string(); }
+	else { request_uri = (char*)env->GetStringUTFChars(requestUri, &isCopy);}
 
     struct Header** response_headers = init_headers(env, responseHeaders);
     char * response_body = init_body(env, responseBody);
+    
+    // call function
     struct ValidationError * error = JSightValidateHttpResponse(api_spec_file_path, request_method, request_uri, responseStatusCode, response_headers, response_body);
-    env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path);
-    env->ReleaseStringUTFChars(requestMethod  , request_method);
-    env->ReleaseStringUTFChars(requestUri     , request_uri);
+    
+    // free resources
+    if( apiSpecFilePath == NULL ) {free(api_spec_file_path);}
+    else { env->ReleaseStringUTFChars(apiSpecFilePath, api_spec_file_path); } 
+    if( requestMethod == NULL ) {free(request_method);}
+    else { env->ReleaseStringUTFChars(requestMethod, request_method); } 
+    if( requestUri == NULL ) {free(request_uri);}
+    else { env->ReleaseStringUTFChars(requestUri, request_uri); }
+
     free_headers(response_headers);
     free_body(response_body);
      
@@ -114,13 +148,18 @@ JNIEXPORT jstring JNICALL Java_io_jsight_JSight_SerializeError
     // thanks to its destructor
     JValidationErrorBox * jerror_box = new JValidationErrorBox( env, jerror );
     jboolean isCopy;
-	char * format  = (char*)env->GetStringUTFChars(jformat, &isCopy);
+
+    char * format = NULL;
+    if( jformat == NULL ) { format = empty_string(); } 
+    else { format = (char*)env->GetStringUTFChars(jformat, &isCopy);}
 
     char * json = JSightSerializeError(format, jerror_box->getValidationError());
     jstring jjson = env->NewStringUTF(json);
 
     // free resources
-    env->ReleaseStringUTFChars(jformat, format);
+    if( jformat == NULL ) {free(format);}
+    else { env->ReleaseStringUTFChars(jformat, format); }
+    
     delete(jerror_box);
     free(json);
 

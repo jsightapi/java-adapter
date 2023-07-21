@@ -167,9 +167,31 @@ public class AppTest
 
     @Test
     public void testEmptyHeadersAndBodies() throws JSONException {
-        ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "GET", "/users", null, null);
+        ValidationError error = JSight.ValidateHttpRequest(this.testSpecPath, "GET", "/empty", null, null);
         assertNull(error);
-        error = JSight.ValidateHttpRequest(this.testSpecPath, "GET", "/users", new HashMap<String, List<String>>(), new byte[0]);
+        error = JSight.ValidateHttpRequest(this.testSpecPath, "GET", "/empty", new HashMap<String, List<String>>(), new byte[0]);
         assertNull(error);
+        error = JSight.ValidateHttpResponse(this.testSpecPath, "GET", "/empty", 200, null, null);
+        assertNull(error);
+        error = JSight.ValidateHttpResponse(this.testSpecPath, "GET", "/empty", 200, new HashMap<String, List<String>>(), new byte[0]);
+        assertNull(error);    
+    }
+
+    @Test
+    public void testNullPointerResistance() throws JSONException {
+        ValidationError error = JSight.ValidateHttpRequest(null, null, null, null, null);
+        assertNotNull(error);
+        error = JSight.ValidateHttpResponse(null, null, null, 0, null, null);
+        assertNotNull(error);
+        String some = JSight.SerializeError(null, null);
+        assertNotNull(some);
+        String json = new ValidationError(
+                null, null, 0, null, null,
+                new ErrorPosition(null, null, null, null),
+                new String[] {null, null, null}
+            ).toJSON();
+        assertNotNull(json);
+        json = new ValidationError(null, null, 0, null, null, null, null).toJSON();
+        assertNotNull(json);
     }
 }

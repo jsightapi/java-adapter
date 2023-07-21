@@ -164,6 +164,12 @@ jobject new_jValidationError(JNIEnv * env, struct ValidationError * error) {
 	return jValidationError;
 }
 
+char * empty_string() {
+	char * str = (char *)malloc(sizeof(char));
+	str[0] = '\0';
+	return str;
+}
+
 void println(JNIEnv * env, const char * cstr) {
     jstring str = env->NewStringUTF(cstr);
     println(env, str);
