@@ -1,0 +1,10 @@
+version: '3.1'
+services:
+  headers: 
+    image: amazoncorretto:20
+    container_name: headers
+    volumes:
+      - ./../../src:/app/src
+      - ./../../target:/app/target
+    command: javac -h /app/src/cpp -d /app/target/classes /app/src/main/java/io/jsight/JSight.java /app/src/main/java/io/jsight/ValidationError.java /app/src/main/java/io/jsight/ErrorPosition.java
+    

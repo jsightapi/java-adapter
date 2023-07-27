@@ -1,0 +1,38 @@
+JSIGHT 0.3
+
+GET /empty
+  200 empty
+
+URL /users
+  POST
+    Request
+      Headers
+        {
+          "Content-Type": "application/json" // {const: true}
+        }
+      Body
+        {
+          "id": 123,
+          "name": "John"
+        }
+    200
+      Headers
+        {
+          "Content-Type": "application/json" // {const: true}
+        }
+      Body
+        {
+          "id": 123,
+          "name": "John"
+        }
+  DELETE
+    204 any
+
+URL /headers/numeric
+  POST
+    Request
+      Headers
+        {
+          "X-Number": 123
+        }
+      Body any
